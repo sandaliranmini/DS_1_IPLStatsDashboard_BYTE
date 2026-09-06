@@ -71,4 +71,35 @@ else:
     fig1.update_layout(xaxis_tickangle=-45)
     st.plotly_chart(fig1, use_container_width=True)
 
+# 2 charts of Top Batsman and Bowlers
+col1, col2 = st.columns(2)
 
+with col1:
+    st.subheader("Top 10 Run-Scorers")
+    batsmen = deliveries[deliveries['match_id'].isin(filtered['match_id'])]
+    top_bats = batsmen.groupby('striker')['batsman_runs'].sum().reset_index()
+    top_bats.columns = ['Player', 'Runs']
+    top_bats = top_bats.sort_values('Runs', ascending=False).head(10)
+    
+    fig2 = px.bar(top_bats, x='Runs', y='Player', orientation='h', 
+                  title="Top Run-Scorers", color='Runs',
+                  color_continuous_scale='Viridis')
+    fig2.update_layout(yaxis={'categoryorder': 'total ascending'})
+    st.plotly_chart(fig2, use_container_width=True)
+
+with col2:
+    st.subheader("Top 10 Wicket-Takers")
+    wickets = deliveries[(deliveries['match_id'].isin(filtered['match_id'])) & 
+                         (deliveries['is_wicket'] == 1)]
+    top_wkts = wickets.groupby('bowler').size().reset_index(name='Wickets')
+    top_wkts = top_wkts.sort_values('Wickets', ascending=False).head(10)
+    
+    fig3 = px.bar(top_wkts, x='Wickets', y='bowler', orientation='h',
+                  title="Top Wicket-Takers", color='Wickets',
+                  color_continuous_scale='Reds')
+    fig3.update_layout(yaxis={'categoryorder': 'total ascending'})
+    st.plotly_chart(fig3, use_container_width=True)
+
+  
+
+    

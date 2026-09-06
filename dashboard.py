@@ -12,6 +12,7 @@ st.sidebar.info(
     "**URL:** https://www.kaggle.com/datasets/meruvakodandasuraj/ipl-complete-dataset-2008-2025\n"
     f"**Extraction Date:** {datetime.now().strftime('%Y-%m-%d')}"
 )
+st.sidebar.image("IPL_logo.jpg", use_container_width=True)
 
 # Read data
 matches = pd.read_csv("matches.csv")
@@ -70,4 +71,4 @@ else:
     fig1.update_layout(xaxis_tickangle=-45)
     st.plotly_chart(fig1, use_container_width=True)
 
-    
+

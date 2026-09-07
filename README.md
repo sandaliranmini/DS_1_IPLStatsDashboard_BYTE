@@ -31,3 +31,12 @@ Interactive dashboard for analyzing IPL team and player performance (2008-2025).
    python -m streamlit run dashboard.py
    ```
 5. **Open your browser and navigate to the URL shown in the terminal**
+
+## Key Insights (Quick Summary)
+
+- **Top Run-Scorer:** Virat Kohli (8,000+ runs)
+- **Top Wicket-Taker:** Yuzvendra Chahal
+- **Most Successful Team:** MI & CSK (>55% win rate)
+- **Scoring Trend:** 18% increase since 2008
+
+**[View Full Insights](INSIGHTS.md)**

@@ -129,3 +129,13 @@ st.subheader("Key Insights")
 st.write("• Dashboard shows IPL statistics from multiple seasons")
 st.write("• Use filters in sidebar to explore specific seasons/teams")
 st.write("• All charts update automatically based on filters") 
+
+# footer
+st.markdown("---")
+st.markdown("""
+    <div style="display: flex; justify-content: space-between; color: #888; font-size: 12px; padding: 5px;">
+        <span>IPL Dashboard • AVIP 2026</span>
+        <span>Data: Kaggle IPL Dataset 2008-2025</span>
+        <span>Generated: {datetime}</span>
+    </div>
+""".format(datetime=datetime.now().strftime('%Y-%m-%d %H:%M')), unsafe_allow_html=True)

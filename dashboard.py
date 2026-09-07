@@ -2,8 +2,37 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
+import base64
 
 st.set_page_config(page_title="IPL Dashboard", layout="wide")
+
+#export function
+def download_chart_button(fig, filename, button_text):
+    """Convert plotly figure to PNG and provide download button"""
+    try:
+        img_bytes = fig.to_image(format="png", width=800, height=500)
+        b64 = base64.b64encode(img_bytes).decode()
+        
+        button_html = f'''
+            <a href="data:image/png;base64,{b64}" download="{filename}.png" target="_blank">
+                <button style="
+                    background-color: #1a237e;
+                    color: white;
+                    padding: 8px 20px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: bold;
+                    transition: background-color 0.3s;
+                ">
+                    {button_text}
+                </button>
+            </a>
+        '''
+        return button_html
+    except Exception as e:
+        return f"Export error: {e}"
 
 # Data Source
 st.sidebar.markdown("### Data Source")
@@ -65,11 +94,22 @@ if 'first_innings_score' in filtered.columns:
     fig1 = px.line(runs_data, x='season', y='avg_runs', title="Average Runs Per Match")
     fig1.update_layout(xaxis_tickangle=-45)
     st.plotly_chart(fig1, use_container_width=True)
+
+    # Export button for Runs per match Chart
+    st.markdown(download_chart_button(fig1, "runs_per_match", "Download Chart as PNG"), unsafe_allow_html=True)
 else:
+    st.warning("⚠️ 'first_innings_score' column not found. Showing matches per season instead.")
     alt_data = filtered.groupby('season').size().reset_index(name='matches')
-    fig1 = px.bar(alt_data, x='season', y='matches', title="Matches Per Season")
+    fig1 = px.bar(alt_data, x='season', y='matches', title="Matches Per Season",
+                  color_discrete_sequence=['#1a237e'])
     fig1.update_layout(xaxis_tickangle=-45)
     st.plotly_chart(fig1, use_container_width=True)
+    
+    # Export button for Chart Runs per match alternative
+    st.markdown(download_chart_button(fig1, "matches_per_season", "Download Chart as PNG"), unsafe_allow_html=True)
+    
+
+st.markdown("---")
 
 # 2 charts of Top Batsman and Bowlers
 col1, col2 = st.columns(2)
@@ -87,6 +127,9 @@ with col1:
     fig2.update_layout(yaxis={'categoryorder': 'total ascending'})
     st.plotly_chart(fig2, use_container_width=True)
 
+    # Export button for chart of Top Batsmans
+    st.markdown(download_chart_button(fig2, "top_run_scorers", "Download Chart as PNG"), unsafe_allow_html=True)
+
 with col2:
     st.subheader("Top 10 Wicket-Takers")
     wickets = deliveries[(deliveries['match_id'].isin(filtered['match_id'])) & 
@@ -99,6 +142,11 @@ with col2:
                   color_continuous_scale='Reds')
     fig3.update_layout(yaxis={'categoryorder': 'total ascending'})
     st.plotly_chart(fig3, use_container_width=True)
+
+    # Export button for chart of top bowlers
+    st.markdown(download_chart_button(fig3, "top_wicket_takers", "Download Chart as PNG"), unsafe_allow_html=True)
+
+st.markdown("---")
 
 # Team Win Percentage chart
 st.subheader("Team Win Percentages")
@@ -122,6 +170,9 @@ fig4 = px.bar(win_pct, x='Team', y='Win%', title="Win Percentage by Team",
 fig4.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
 fig4.update_layout(xaxis_tickangle=-45)
 st.plotly_chart(fig4, use_container_width=True)
+
+# Export button for Chart of team win percentage
+st.markdown(download_chart_button(fig4, "team_win_percentages", "Download Chart as PNG"), unsafe_allow_html=True)
 
 #Insight
 st.markdown("---")

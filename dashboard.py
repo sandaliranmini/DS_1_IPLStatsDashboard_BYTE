@@ -123,4 +123,9 @@ fig4.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
 fig4.update_layout(xaxis_tickangle=-45)
 st.plotly_chart(fig4, use_container_width=True)
 
-    
+#Insight
+st.markdown("---")
+st.subheader("Key Insights")
+st.write("• Dashboard shows IPL statistics from multiple seasons")
+st.write("• Use filters in sidebar to explore specific seasons/teams")
+st.write("• All charts update automatically based on filters") 

@@ -34,12 +34,13 @@ def download_chart_button(fig, filename, button_text):
     except Exception as e:
         return f"Export error: {e}"
 
+
 # Data Source
 st.sidebar.markdown("### Data Source")
 st.sidebar.info(
     "**Source:** Kaggle IPL Dataset\n"
     "**URL:** https://www.kaggle.com/datasets/meruvakodandasuraj/ipl-complete-dataset-2008-2025\n"
-    f"**Extraction Date:** {datetime.now().strftime('%Y-%m-%d')}"
+    f"**Extraction Date:**2026-09-05"
 )
 st.sidebar.image("IPL_logo.jpg", use_container_width=True)
 
@@ -84,14 +85,10 @@ st.markdown("---")
 
 # Runs Per Match
 st.subheader(" Runs Per Match Over Seasons")
+runs = deliveries[deliveries['match_id'].isin(filtered['match_id'])].groupby('match_id')['total_runs'].sum().reset_index()
+runs = runs.merge(matches[['match_id', 'date']], on='match_id').sort_values('date')
+fig1 = px.line(runs, x='date', y='total_runs', title="Runs Per Match")
 if 'first_innings_score' in filtered.columns:
-    runs_data = filtered.groupby('season').agg({
-        'match_id': 'count',
-        'first_innings_score': 'sum'
-    }).reset_index()
-    runs_data['avg_runs'] = runs_data['first_innings_score'] / runs_data['match_id']
-    
-    fig1 = px.line(runs_data, x='season', y='avg_runs', title="Average Runs Per Match")
     fig1.update_layout(xaxis_tickangle=-45)
     st.plotly_chart(fig1, use_container_width=True)
 
@@ -132,8 +129,7 @@ with col1:
 
 with col2:
     st.subheader("Top 10 Wicket-Takers")
-    wickets = deliveries[(deliveries['match_id'].isin(filtered['match_id'])) & 
-                         (deliveries['is_wicket'] == 1)]
+    wickets = wickets[~wickets['dismissal_type'].isin(['run out', 'retired hurt', 'obstructing the field'])]
     top_wkts = wickets.groupby('bowler').size().reset_index(name='Wickets')
     top_wkts = top_wkts.sort_values('Wickets', ascending=False).head(10)
     

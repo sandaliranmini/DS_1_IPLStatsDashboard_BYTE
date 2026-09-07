@@ -100,6 +100,27 @@ with col2:
     fig3.update_layout(yaxis={'categoryorder': 'total ascending'})
     st.plotly_chart(fig3, use_container_width=True)
 
-  
+# Team Win Percentage chart
+st.subheader("Team Win Percentages")
+
+wins = filtered['winner'].value_counts().reset_index()
+wins.columns = ['Team', 'Wins']
+
+# Count total matches per team
+total = pd.concat([filtered['team1'], filtered['team2']]).value_counts().reset_index()
+total.columns = ['Team', 'Total']
+
+win_pct = total.merge(wins, on='Team', how='left')
+win_pct['Wins'] = win_pct['Wins'].fillna(0)
+win_pct['Win%'] = (win_pct['Wins'] / win_pct['Total'] * 100).round(2)
+win_pct = win_pct.sort_values('Win%', ascending=False)
+
+fig4 = px.bar(win_pct, x='Team', y='Win%', title="Win Percentage by Team",
+              text='Win%',
+              color='Win%',
+              color_continuous_scale='Blues')
+fig4.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
+fig4.update_layout(xaxis_tickangle=-45)
+st.plotly_chart(fig4, use_container_width=True)
 
     

@@ -6,6 +6,18 @@ import base64
 
 st.set_page_config(page_title="IPL Dashboard", layout="wide")
 
+st.markdown(
+    """
+    <style>
+    [data-testid="stToolbar"] {visibility: hidden;}
+    [data-testid="stStatusWidget"] {visibility: hidden;}
+    [data-testid="stMainMenu"] {visibility: hidden;}
+    [data-testid="stAppDeployButton"] {display: none;}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 #export function
 def download_chart_button(fig, filename, button_text):
     """Convert plotly figure to PNG and provide download button"""
@@ -129,7 +141,7 @@ with col1:
 
 with col2:
     st.subheader("Top 10 Wicket-Takers")
-    wickets = wickets[~wickets['dismissal_type'].isin(['run out', 'retired hurt', 'obstructing the field'])]
+    wickets = deliveries[(deliveries['match_id'].isin(filtered['match_id'])) & (deliveries['is_wicket'] == 1)]
     top_wkts = wickets.groupby('bowler').size().reset_index(name='Wickets')
     top_wkts = top_wkts.sort_values('Wickets', ascending=False).head(10)
     

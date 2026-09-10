@@ -18,33 +18,30 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-#export function
-def download_chart_button(fig, filename, button_text):
-    """Convert plotly figure to PNG and provide download button"""
+# export function - supports PNG, PDF, SVG using native Streamlit buttons
+def download_chart_buttons(fig, filename):
+    """Convert plotly figure to PNG/PDF/SVG and provide download buttons"""
     try:
-        img_bytes = fig.to_image(format="png", width=800, height=500)
-        b64 = base64.b64encode(img_bytes).decode()
+        formats = [
+            ("png", "image/png", "PNG"),
+            ("pdf", "application/pdf", "PDF"),
+            ("svg", "image/svg+xml", "SVG"),
+        ]
         
-        button_html = f'''
-            <a href="data:image/png;base64,{b64}" download="{filename}.png" target="_blank">
-                <button style="
-                    background-color: #1a237e;
-                    color: white;
-                    padding: 8px 20px;
-                    border: none;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    font-size: 14px;
-                    font-weight: bold;
-                    transition: background-color 0.3s;
-                ">
-                    {button_text}
-                </button>
-            </a>
-        '''
-        return button_html
+        cols = st.columns(len(formats))
+        
+        for i, (fmt, mime, label) in enumerate(formats):
+            with cols[i]:
+                img_bytes = fig.to_image(format=fmt, width=800, height=500)
+                st.download_button(
+                    label=f"⬇ {label}",
+                    data=img_bytes,
+                    file_name=f"{filename}.{fmt}",
+                    mime=mime,
+                    key=f"dl_{filename}_{fmt}"  # Unique key required
+                )
     except Exception as e:
-        return f"Export error: {e}"
+        st.error(f"Export error: {e}")
 
 
 # Data Source
@@ -105,7 +102,7 @@ if 'first_innings_score' in filtered.columns:
     st.plotly_chart(fig1, use_container_width=True)
 
     # Export button for Runs per match Chart
-    st.markdown(download_chart_button(fig1, "runs_per_match", "Download Chart as PNG"), unsafe_allow_html=True)
+    download_chart_buttons(fig1, "runs_per_match")
 else:
     st.warning("⚠️ 'first_innings_score' column not found. Showing matches per season instead.")
     alt_data = filtered.groupby('season').size().reset_index(name='matches')
@@ -115,8 +112,7 @@ else:
     st.plotly_chart(fig1, use_container_width=True)
     
     # Export button for Chart Runs per match alternative
-    st.markdown(download_chart_button(fig1, "matches_per_season", "Download Chart as PNG"), unsafe_allow_html=True)
-    
+    download_chart_buttons(fig1, "runs_per_match")
 
 st.markdown("---")
 
@@ -137,7 +133,7 @@ with col1:
     st.plotly_chart(fig2, use_container_width=True)
 
     # Export button for chart of Top Batsmans
-    st.markdown(download_chart_button(fig2, "top_run_scorers", "Download Chart as PNG"), unsafe_allow_html=True)
+    download_chart_buttons(fig2, "top_10_run_scorers")
 
 with col2:
     st.subheader("Top 10 Wicket-Takers")
@@ -152,7 +148,7 @@ with col2:
     st.plotly_chart(fig3, use_container_width=True)
 
     # Export button for chart of top bowlers
-    st.markdown(download_chart_button(fig3, "top_wicket_takers", "Download Chart as PNG"), unsafe_allow_html=True)
+    download_chart_buttons(fig3, "top_10-wicket_takers")
 
 st.markdown("---")
 
@@ -180,7 +176,7 @@ fig4.update_layout(xaxis_tickangle=-45)
 st.plotly_chart(fig4, use_container_width=True)
 
 # Export button for Chart of team win percentage
-st.markdown(download_chart_button(fig4, "team_win_percentages", "Download Chart as PNG"), unsafe_allow_html=True)
+download_chart_buttons(fig4, "team_win percentage")
 
 #Insight
 st.markdown("---")
